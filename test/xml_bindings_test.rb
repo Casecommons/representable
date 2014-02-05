@@ -18,6 +18,18 @@ class XMLBindingTest < MiniTest::Spec
     self.representation_wrap = :song
   end
 
+  class SongDecorator < Representable::Decorator
+    include Representable::XML
+
+    property :name
+  end
+
+  class AlbumDecorator < Representable::Decorator
+    include Representable::XML
+
+    property :best_song, as: :favorite_song, decorator: SongDecorator
+  end
+
   before do
     @doc  = Nokogiri::XML::Document.new
     @song = SongWithRepresenter.new("Thinning the Herd")
@@ -66,6 +78,18 @@ class XMLBindingTest < MiniTest::Spec
       it "inserts with #write" do
         @property.write(@doc, @song)
         assert_xml_equal("<song><name>Thinning the Herd</name></song>", @doc.to_s)
+      end
+    end
+
+    describe 'with a nested property and :decorator' do
+      before do
+        @album = Album.new(nil, Song.new("Waka"))
+        @property = Representable::XML::PropertyBinding.new(Representable::Definition.new(:album, :decorator => AlbumDecorator), nil)
+      end
+
+      it 'sets the property using the :as option' do
+        @property.write(@doc, @album)
+        assert_xml_equal("<album><favorite_song><name>Waka</name></favorite_song></album>", @doc.to_s)
       end
     end
   end
