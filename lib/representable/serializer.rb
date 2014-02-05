@@ -4,18 +4,12 @@ module Representable
   class ObjectSerializer < ObjectDeserializer
     def call # TODO: make typed? switch here!
       return @object if @object.nil?
-
       representable = prepare(@object)
+      return representable unless @binding.typed?
 
-      serialize(representable, @binding.user_options)
-    end
+      options = @binding.user_options.merge(as: @binding.options[:as], wrap: false)
 
-  private
-    def serialize(object, user_options)
-      # TODO: this used to be handled in #serialize where Object added it's behaviour. treat scalars as objects to remove this switch:
-      return object unless @binding.typed?
-
-      object.send(@binding.serialize_method, user_options.merge!({:wrap => false}))
+      representable.send(@binding.serialize_method, options)
     end
   end
 end
