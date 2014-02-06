@@ -52,7 +52,9 @@ module Representable
     # Returns a Nokogiri::XML object representing this object.
     def to_node(options={})
       options[:doc] ||= Nokogiri::XML::Document.new
-      root_tag = options[:wrap] || options[:as]||  representation_wrap
+
+      tag_name = options[:binding].try(:from)
+      root_tag = options[:wrap] || tag_name || representation_wrap
 
       create_representation_with(Nokogiri::XML::Node.new(root_tag.to_s, options[:doc]), options, PropertyBinding)
     end

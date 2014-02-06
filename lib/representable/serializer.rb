@@ -7,8 +7,7 @@ module Representable
       representable = prepare(@object)
       return representable unless @binding.typed?
 
-      options = @binding.user_options.merge(as: @binding.options[:as], wrap: false)
-
+      options = @binding.user_options.merge(binding: @binding, wrap: false)
       representable.send(@binding.serialize_method, options)
     end
   end
