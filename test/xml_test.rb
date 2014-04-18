@@ -193,11 +193,15 @@ class XmlTest < MiniTest::Spec
         @album = Album.new([Song.new("I Hate My Brain"), mr=Song.new("Mr. Charisma")], mr)
         @album.extend(AlbumRepresenter)
 
-        assert_xml_equal "<album>
-  <song><name>Mr. Charisma</name></song>
-  <song><name>I Hate My Brain</name></song>
-  <song><name>Mr. Charisma</name></song>
-</album>", @album.to_xml
+        xml = %{
+          <album>
+            <best_song><name>Mr. Charisma</name></best_song>
+            <song><name>I Hate My Brain</name></song>
+            <song><name>Mr. Charisma</name></song>
+          </album>
+        }
+
+        assert_xml_equal xml, @album.to_xml
       end
 
       it "extends contained models when deserializing" do

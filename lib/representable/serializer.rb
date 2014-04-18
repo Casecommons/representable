@@ -20,7 +20,11 @@ module Representable
     def serialize(object, user_options)
       return object unless @binding.representable?
 
-      object.send(@binding.serialize_method, user_options.merge!({:wrap => false}))
+      name = @binding[:as].evaluate(:value) || (@binding.name)
+
+      options = user_options.merge(:wrap => false, :name => (name unless name.to_s == "_self"))
+
+      object.send(@binding.serialize_method, options)
     end
   end
 end

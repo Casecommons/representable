@@ -28,7 +28,7 @@ class XMLBindingTest < MiniTest::Spec
     include Representable::XML
 
     property :best_song, as: :favorite_song, decorator: SongDecorator
-    property :worst_song, getter: ->(*) { Song.new("rap") }, decorator: SongDecorator
+    property :worst_song, getter: ->(*) { Song.new("Rap") }, decorator: SongDecorator
   end
 
   before do
@@ -85,21 +85,12 @@ class XMLBindingTest < MiniTest::Spec
     describe 'with a nested property and :decorator' do
       before do
         @album = Album.new(nil, Song.new("Waka"))
-        @property = Representable::XML::PropertyBinding.new(Representable::Definition.new(:album, :decorator => AlbumDecorator), nil)
+        @property = Representable::XML::PropertyBinding.new(Representable::Definition.new(:album, :decorator => AlbumDecorator), nil, nil)
       end
 
       it 'sets the property using the :as option or the property name' do
         @property.write(@doc, @album)
-        xml = <<-XML
-<album>
-  <favorite_song>
-    <name>Waka</name>
-  </favorite_song>
-  <worst_song>
-    <name>Rap</name>
-  </worst_song>
-</album>
-        XML
+        xml = %{<album><favorite_song><name>Waka</name></favorite_song><worst_song><name>Rap</name></worst_song></album>}
         assert_xml_equal(xml, @doc.to_s)
       end
     end
