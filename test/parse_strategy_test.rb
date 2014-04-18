@@ -229,7 +229,6 @@ class ParseStrategyLambdaTest < MiniTest::Spec
 
     let (:album) { Struct.new(:songs).new([Song.new(1, "A Walk")]).extend(representer) }
 
-
     it "adds to existing collection" do
       songs_id = album.songs.object_id
 
@@ -244,5 +243,33 @@ class ParseStrategyLambdaTest < MiniTest::Spec
     end
 
     # TODO: test with existing collection
+  end
+
+  describe "collection with ignore_nil_instance" do
+    representer!(:inject => :song_representer) do
+      collection :songs, :parse_strategy => lambda { |fragment, i, options|
+        return nil unless fragment.has_key?("title")
+        songs << song = Song.new
+        song
+      }, :extend => song_representer, :ignore_nil_instance => true
+    end
+
+    let (:album) { Struct.new(:songs).new([Song.new(1, "A Walk")]).extend(representer) }
+
+
+    it "adds the non-nil records, and skips the nil records" do
+      songs_id = album.songs.object_id
+
+      album.from_hash({"songs"=>[{"title"=>"Resist Stance"}, {}]})
+
+      album.songs.length.must_equal 2
+
+      album.songs[0].title.must_equal "A Walk" # note how title is updated from "Resist Stan"
+      album.songs[0].id.must_equal 1
+      album.songs[1].title.must_equal "Resist Stance"
+      album.songs[1].id.must_equal nil
+
+      album.songs.object_id.must_equal songs_id
+    end
   end
 end
