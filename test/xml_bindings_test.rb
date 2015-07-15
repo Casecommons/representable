@@ -96,7 +96,7 @@ class XMLBindingTest < MiniTest::Spec
     <name>Waka</name>
   </favorite_song>
   <worst_song>
-    <name>Rap</name>
+    <name>rap</name>
   </worst_song>
 </album>
         XML
