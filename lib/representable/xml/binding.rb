@@ -37,7 +37,10 @@ module Representable
       end
 
       def serialize_node(node, value)
-        return value if typed?
+        if typed?
+          value.name = as if as
+          return value
+        end
 
         node.content = value
         node
